@@ -3,7 +3,7 @@ import requests
 import json  # Tilføj import for json
 
 # Din API-endpoint
-API_URL = "https://plantejuicingrest20250506131910.azurewebsites.net/api/Jordfugtighed"
+API_URL = "https://plantejuicingrest20250506131910.azurewebsites.net/api/SoilMoisture"
 
 # Setup UDP-server
 serverPort = 12000
@@ -30,7 +30,7 @@ try:
                 # Forbered payload
                 payload = {
                     "id": 1,  # ID kan være dynamisk eller fast, afhængig af din API
-                    "jordfugtighedValue": round(moisture),  # Runder værdien til nærmeste heltal
+                    "soilMoistureValue": round(moisture),  # Runder værdien til nærmeste heltal
                 }
 
                 # Konverter payload til JSON-streng med dobbelt anførselstegn
