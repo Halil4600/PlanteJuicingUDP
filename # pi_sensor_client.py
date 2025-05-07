@@ -9,15 +9,15 @@ serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
-DRY_VALUE = 1.5 
-WET_VALUE = 3.8 
+DRY_VALUE = 0 
+WET_VALUE = 4 
 
 def get_moisture_percentage(raw_value):
     raw_value = max(min(raw_value, WET_VALUE), DRY_VALUE)
     percentage = 100 * (raw_value - DRY_VALUE) / (WET_VALUE - DRY_VALUE)
     return round(percentage, 1)
 
-print("Måler og sender data som UDP broadcast hvert minut...")
+print("Måler og sender data som UDP broadcast hvert halve minut...")
 
 try:
     while True:
