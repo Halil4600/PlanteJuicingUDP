@@ -69,15 +69,15 @@ try:
                 print(f"❌ Fejl ved parsing af temperaturdata: {e}")
 
         elif decoded.startswith("water:") and ";" in decoded:
-            # Håndter lysdata
+            # Håndter vanddata
             try:
                 parts = decoded.split(";")
-                waterLevel = int(parts[0].split(":")[1].strip())
+                waterLevelValue = float(parts[0].split(":")[1].replace("%", "").strip())  # Fjern procenttegn og konverter til float
                 raw = float(parts[1].split(":")[1].strip())
 
                 payload = {
                     "id": 3,
-                    "WaterLevel": round(waterLevel),  # Runder til nærmeste heltal
+                    "waterLevelValue": round(waterLevelValue),  # Runder til nærmeste heltal
                 }
 
                 # Send data til API
