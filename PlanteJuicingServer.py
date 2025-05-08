@@ -1,9 +1,11 @@
 from socket import *
 import requests
-import json  # Tilføj import for json
+import json
 
 # Din API-endpoint
-API_URL = "https://plantejuicingrest20250506131910.azurewebsites.net/api/SoilMoisture"
+API_URLMoisture = "https://plantejuicingrest20250506131910.azurewebsites.net/api/SoilMoisture"
+API_URLTemperature = "https://plantejuicingrest20250506131910.azurewebsites.net/api/Temp"
+API_URLWaterLevel = "https://plantejuicingrest20250506131910.azurewebsites.net/api/WaterLevel"
 
 # Setup UDP-server
 serverPort = 12000
@@ -19,34 +21,75 @@ try:
         decoded = message.decode().strip()
         print("📥 Modtaget:", decoded)
 
-        # Forventet format: "moisture:74.3%;raw:3.21"
+        # Identificer datatypen og opbyg payload
         if decoded.startswith("moisture:") and ";" in decoded:
+            # Håndter jordfugtighedsdata
             try:
-                # Parse data
                 parts = decoded.split(";")
                 moisture = float(parts[0].split(":")[1].replace("%", "").strip())
                 raw = float(parts[1].split(":")[1].strip())
 
-                # Forbered payload
                 payload = {
-                    "id": 1,  # ID kan være dynamisk eller fast, afhængig af din API
-                    "soilMoistureValue": round(moisture),  # Runder værdien til nærmeste heltal
+                    "Id": 1,
+                    "SoilMoistureValue": round(moisture)  # Runder til nærmeste heltal
                 }
 
-                # Konverter payload til JSON-streng med dobbelt anførselstegn
-                json_payload = json.dumps(payload)
-
                 # Send data til API
-                response = requests.post(API_URL, data=json_payload, headers={"Content-Type": "application/json"})
-                print(f"📤 Payload sendt: {json_payload}")
+                response = requests.post(API_URLMoisture, json=payload, headers={"Content-Type": "application/json"})
+                print(f"📤 Payload sendt: {payload}")
                 print(f"📥 API-svar: Statuskode {response.status_code}, Indhold: {response.text}")
 
             except (ValueError, IndexError) as e:
-                print(f"❌ Fejl ved parsing af data: {e}")
-            except requests.RequestException as e:
-                print(f"❌ Fejl ved kommunikation med API: {e}")
+                print(f"❌ Fejl ved parsing af jordfugtighedsdata: {e}")
+
+        elif decoded.startswith("Temp"):
+            # Håndter temperaturdata
+            try:
+                # Hvis beskeden indeholder ";", parse begge værdier
+                if ";" in decoded:
+                    parts = decoded.split(";")
+                    temperature = float(parts[0].split(":")[1].strip())
+                    raw = float(parts[1].split(":")[1].strip())
+                else:
+                    # Hvis beskeden kun indeholder én værdi (f.eks. "Temp3")
+                    temperature = float(decoded.split("Temp")[1].strip())
+                    raw = None  # Ingen raw-værdi i dette tilfælde
+
+                payload = {
+                    "Id": 2,
+                    "TempValue": round(temperature),  # Runder til én decimal
+                }
+
+                # Send data til API
+                response = requests.post(API_URLTemperature, json=payload, headers={"Content-Type": "application/json"})
+                print(f"📤 Payload sendt: {payload}")
+                print(f"📥 API-svar: Statuskode {response.status_code}, Indhold: {response.text}")
+
+            except (ValueError, IndexError) as e:
+                print(f"❌ Fejl ved parsing af temperaturdata: {e}")
+
+        elif decoded.startswith("water:") and ";" in decoded:
+            # Håndter lysdata
+            try:
+                parts = decoded.split(";")
+                waterLevel = int(parts[0].split(":")[1].strip())
+                raw = float(parts[1].split(":")[1].strip())
+
+                payload = {
+                    "id": 3,
+                    "WaterLevel": round(waterLevel),  # Runder til nærmeste heltal
+                }
+
+                # Send data til API
+                response = requests.post(API_URLWaterLevel, json=payload, headers={"Content-Type": "application/json"})
+                print(f"📤 Payload sendt: {payload}")
+                print(f"📥 API-svar: Statuskode {response.status_code}, Indhold: {response.text}")
+
+            except (ValueError, IndexError) as e:
+                print(f"❌ Fejl ved parsing af waterData: {e}")
+
         else:
-            print("⚠️ Modtaget data i forkert format, ignoreret.")
+            print("⚠️ Modtaget data i ukendt format, ignoreret.")
 
 except KeyboardInterrupt:
     print("🛑 Serveren stoppes...")
