@@ -1,4 +1,4 @@
-pi_Moisture_Client.py
+pi_moisture_Client.py
 
 from socket import *
 import explorerhat

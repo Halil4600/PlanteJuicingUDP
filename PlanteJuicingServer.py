@@ -30,13 +30,12 @@ try:
                 raw = float(parts[1].split(":")[1].strip())
 
                 payload = {
-                    "id": 1,
-                    "soilMoistureValue": round(moisture)  # Runder til nærmeste heltal
+                    "Id": 1,
+                    "SoilMoistureValue": round(moisture)  # Runder til nærmeste heltal
                 }
 
                 # Send data til API
                 response = requests.post(API_URLMoisture, json=payload, headers={"Content-Type": "application/json"})
-               
                 print(f"📤 Payload sendt: {payload}")
                 print(f"📥 API-svar: Statuskode {response.status_code}, Indhold: {response.text}")
 
